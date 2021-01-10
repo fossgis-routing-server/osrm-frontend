@@ -24,17 +24,17 @@ module.exports = {
   },
   services: [{
     label: 'Car',
-    path: '/routed-car/route/v1',
+    path: 'https://routing.openstreetmap.de/routed-car/route/v1',
     debug: 'car',
   },
   {
     label: 'Bike',
-    path: '/routed-bike/route/v1',
+    path: 'https://routing.openstreetmap.de/routed-bike/route/v1',
     debug: 'bike',
   },
   {
     label: 'Foot',
-    path: '/routed-foot/route/v1',
+    path: 'https://routing.openstreetmap.de/routed-foot/route/v1',
     debug: 'foot',
   }],
   layer: [{
