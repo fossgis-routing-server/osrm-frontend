@@ -13,5 +13,8 @@ module.exports = {
   'Bike': 'Bicicleta',
   'Car': 'Coche',
   'Foot': 'Peatón',
-  'About': '<a href=/about.html>Sobre este servicio</a>'
+  'About': '<a href=/about.html>Sobre este servicio</a>',
+  'OpenStreetMap contributors': 'Colaboradores de OpenStreetMap',
+  'Imagery': 'Imágenes',
+  'Data': 'Datos'
 };
