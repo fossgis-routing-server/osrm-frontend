@@ -13,5 +13,6 @@ module.exports = {
   'Start - press enter to drop marker': 'Início - pressione enter para posicionar o marcador',
   'End - press enter to drop marker': 'Fim - pressione enter para posicionar o marcador',
   'Via point - press enter to drop marker': 'Via point - pressione enter para posicionar o marcador',
+  'About': 'Server sponsored by <a href="http://www.nine.ch/">nine</a> | <a href=/about.html>Sur ce service et protection des données</a>',
   'Build': 'Build: '
 };

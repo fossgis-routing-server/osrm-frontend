@@ -69,6 +69,11 @@ var State = L.Class.extend({
           console.error('Error updating itinerary on language change:', err);
         }
       }
+
+      // Update the attribution/footer prefix with the new language
+      if (this._map && this._map.attributionControl) {
+        this._map.attributionControl.setPrefix(localization.t(e.language, 'About'));
+      }
     }.bind(this));
     this._tools.on('unitschanged', function(e) {
       this.options.units = e.unit;

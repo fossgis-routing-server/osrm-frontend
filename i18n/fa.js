@@ -13,5 +13,6 @@ module.exports = {
   'Start - press enter to drop marker': 'شروع - برای درج نشانه روی نقشه اینتر بزنید',
   'End - press enter to drop marker': 'پایان - برای درج نشانه روی نقشه اینتر بزنید',
   'Via point - press enter to drop marker': 'مسیر میانه - برای درج نشانه روی نقشه اینتر بزنید',
+  'About': 'Server sponsored by <a href="http://www.nine.ch/">nine</a> | <a href=/about.html>About this service and privacy policy</a>',
   'Build': 'بیلد: '
 };

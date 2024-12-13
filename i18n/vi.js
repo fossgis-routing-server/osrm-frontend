@@ -13,5 +13,6 @@ module.exports = {
   'Start - press enter to drop marker': 'Khởi hành – bấm Enter để thả ghim',
   'End - press enter to drop marker': 'Đến – bấm Enter để thả ghim',
   'Via point - press enter to drop marker': 'Qua – bấm Enter để thả ghim',
+  'About': 'Server sponsored by <a href="http://www.nine.ch/">nine</a> | <a href=/about.html>About this service and privacy policy</a>',
   'Build': 'Build: '
 };

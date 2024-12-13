@@ -13,5 +13,9 @@ module.exports = {
   'Start - press enter to drop marker': 'Start - tryck för att placera startpunkt',
   'End - press enter to drop marker': 'Mål - tryck för att placera slutpunkt',
   'Via point - press enter to drop marker': 'Via - tryck för att placera delmålspunkt',
+  'Bike': 'Bike',
+  'Car': 'Car',
+  'Foot': 'Foot',
+  'About': 'Server sponsored by <a href="http://www.nine.ch/">nine</a> | <a href=/about.html>About this service and privacy policy</a>',
   'Build': 'Build: '
 };

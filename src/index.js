@@ -185,7 +185,7 @@ mapLayer = mapLayer.reduce(function(title, layer) {
 });
 
 /* set about text to attribution control */
-map.attributionControl.setPrefix(local['About'])
+map.attributionControl.setPrefix(localization.t(language, 'About'))
 
 /* Leaflet Controls */
 var layersControl = L.control.layers(mapLayer, overlay, {
