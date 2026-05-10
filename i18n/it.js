@@ -16,4 +16,6 @@ module.exports = {
   'Bike': 'Bicicletta',
   'Car': 'Auto',
   'Foot': 'A piedi',
+  'About': 'Server sponsored by <a href="http://www.nine.ch/">nine</a> | <a href=/about.html>About this service and privacy policy</a>',
+  'Build': 'Build: '
 };

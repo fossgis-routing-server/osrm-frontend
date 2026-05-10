@@ -7,11 +7,15 @@ module.exports = {
   'Open in editor': 'Mở trong chương trình vẽ',
   'Open in JOSM': 'Mở trong JOSM',
   'Select language': 'Chọn ngôn ngữ',
+  'Share Route': 'Chia sẻ tuyến đường',
+  'Link': 'Liên kết',
+  'Shortlink': 'Liên kết rút gọn',
   'Start - press enter to drop marker': 'Khởi hành – bấm Enter để thả ghim',
   'End - press enter to drop marker': 'Đến – bấm Enter để thả ghim',
   'Via point - press enter to drop marker': 'Qua – bấm Enter để thả ghim',
   'Bike': 'Bike',
   'Car': 'Car',
   'Foot': 'Foot',
-  'About': '<a href=/about.html>About this service and privacy policy</a>'
+  'About': 'Server sponsored by <a href="http://www.nine.ch/">nine</a> | <a href=/about.html>About this service and privacy policy</a>',
+  'Build': 'Build: '
 };

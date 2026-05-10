@@ -36,7 +36,7 @@ module.exports = {
   },
   popup: {
     removeButtonClass: 'osrm-directions-icon osrm-close-light-icon',
-    uturnButtonClass: 'osrm-directions-icon osrm-u-turn-icon',
+    uturnButtonClass: 'osrm-directions-icon osrm-u-turn-icon'
   },
   tools: {
     popupWindowClass: 'fill-osrm dark',
@@ -47,6 +47,7 @@ module.exports = {
     shareButtonClass: 'osrm-directions-icon osrm-share-icon',
     gpxButtonClass: 'osrm-directions-icon osrm-gpx-icon',
     localizationChooserClass: 'osrm-localization-chooser',
+    profileChooserClass: 'osrm-profile-chooser',
     printButtonClass: 'osrm-directions-icon osrm-printer-icon',
     toolsContainerClass: 'fill-osrm dark',
     position: 'bottomleft'

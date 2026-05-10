@@ -1,0 +1,21 @@
+module.exports = {
+  name: 'Dansk',
+  key: 'da',
+  'Open in Debug Map': 'Åbn i Debug Map',
+  'Open in Mapillary': 'Åbn i Mapillary',
+  'GPX': 'Eksporter GPX-fil',
+  'Open in editor': 'Åbn i redigering',
+  'Open in JOSM': 'Åbn i JOSM',
+  'Select language': 'Vælg sprog',
+  'Share Route': 'Del rute',
+  'Link': 'Link',
+  'Shortlink': 'Kortlink',
+  'Start - press enter to drop marker': 'Start - tryk for at placere startpunkt',
+  'End - press enter to drop marker': 'Mål - tryk for at placere slutpunkt',
+  'Via point - press enter to drop marker': 'Via - tryk for at placere delmålspunkt',
+  'Bike': 'Cykel',
+  'Car': 'Bil',
+  'Foot': 'Til fods',
+  'About': 'Server sponsored by <a href="http://www.nine.ch/">nine</a> | <a href=/about.html>About this service and privacy policy</a>',
+  'Build': 'Bygget: '
+};

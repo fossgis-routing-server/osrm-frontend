@@ -1,0 +1,21 @@
+module.exports = {
+  name: '中文（简体）',
+  key: 'zh-Hans',
+  'Open in Debug Map': '在调试地图中打开',
+  'Open in Mapillary': '在 Mapillary 中打开',
+  'GPX': '导出 GPX 文件',
+  'Open in editor': '在编辑器中打开',
+  'Open in JOSM': '在 JOSM 中打开',
+  'Select language': '选择语言',
+  'Share Route': '分享路线',
+  'Link': '链接',
+  'Shortlink': '短链接',
+  'Start - press enter to drop marker': '起点 - 按回车键放置标记',
+  'End - press enter to drop marker': '终点 - 按回车键放置标记',
+  'Via point - press enter to drop marker': '途经点 - 按回车键放置标记',
+  'Bike': '自行车',
+  'Car': '汽车',
+  'Foot': '步行',
+  'About': 'Server sponsored by <a href="http://www.nine.ch/">nine</a> | <a href=/about.html>About this service and privacy policy</a>',
+  'Build': '构建: '
+};

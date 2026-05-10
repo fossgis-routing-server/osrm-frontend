@@ -4,14 +4,19 @@ var L = require('leaflet');
 
 module.exports = function (language) {
   var osrmTextInstructions = require('osrm-text-instructions')('v5');
+  var supportedCodes = require('osrm-text-instructions/languages').supportedCodes;
+  // Fall back to English for directions text when the chosen language has no
+  // osrm-text-instructions translation (e.g. 'fa'). The app UI strings remain
+  // in the selected language; only the turn-by-turn instructions use English.
+  var directionsLanguage = supportedCodes.indexOf(language) !== -1 ? language : 'en';
 
   function stepToText(step) {
     try {
-      return osrmTextInstructions.compile(language, step, {
+      return osrmTextInstructions.compile(directionsLanguage, step, {
         formatToken : function(token, value) {
         // enclose {way_name}, {rotary_name}, {destination} and {exit} vars with <b>..</b>
-        if (value) {
-          switch (token) {
+          if (value) {
+            switch (token) {
             case 'way_name':
             case 'rotary_name':
             case 'waypoint_name':
@@ -25,7 +30,7 @@ module.exports = function (language) {
           return value;
         }
       });
-    } catch(err) {
+    } catch (err) {
       console.log('Error when compiling text instruction', err, step);
       return undefined;
     }

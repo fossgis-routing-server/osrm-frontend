@@ -4,12 +4,14 @@
   "description": "frontend interface for project osrm",
   "main": "src/index.js",
   "scripts": {
-    "test": "eslint src/*.js i18n/*.js",
+    "test": "node --no-warnings node_modules/.bin/jest",
+    "test:lint": "eslint src/*.js i18n/*.js",
     "replace": "node ./scripts/replace.js",
-    "compile": "browserify -d src/index.js -s osrm > bundle.raw.js && uglifyjs bundle.raw.js -c -m --source-map filename=bundle.js.map -o bundle.js",
-    "build": "npm run replace && npm run compile && cp node_modules/leaflet/dist/leaflet.css css/leaflet.css",
-    "start-index": "budo src/index.js --serve=bundle.js --live -d | bistre",
-    "start": "npm run build && npm run start-index",
+    "clean": "rm -f bundle.raw.js",
+    "compile": "webpack --config webpack.config.js",
+    "build": "npm run clean && npm run replace && npm run compile && cp node_modules/leaflet/dist/leaflet.css css/leaflet.css",
+    "start": "npm run build && webpack serve --config webpack.config.js --mode development",
+    "start-prod": "npm run build && webpack serve --config webpack.config.js --mode production",
     "prepub": "npm run build"
   },
   "repository": {
@@ -23,24 +25,33 @@
     "routing",
     "api"
   ],
-  "author": "amy lee walton",
+  "author": "OSRM contributors",
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/test/**/*.test.js"
+    ]
+  },
   "license": "ISC",
   "devDependencies": {
-    "bistre": "^1.0.1",
-    "browserify": "^17.0.0",
-    "budo": "^11.8.4",
-    "uglify-js": "^3.17.4"
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.2.1",
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0",
+    "webpack": "^5.106.2",
+    "webpack-cli": "^7.0.2",
+    "webpack-dev-server": "^5.0.0"
   },
   "dependencies": {
+    "@mapbox/corslite": "^0.0.7",
     "file-saver": "^2.0.5",
-    "jsonp": "^0.2.0",
-    "jxon": "^2.0.0-beta.5",
+    "jsonp": "^0.2.1",
     "leaflet": "~1.9.4",
-    "leaflet-control-geocoder": "~2.4.0",
-    "leaflet-routing-machine": "git+https://github.com/sosm/leaflet-routing-machine#fa91a9160cb5b1bc8ed00beb40f253bc68204d24",
-    "leaflet.locatecontrol": "~0.79.0",
+    "leaflet-control-geocoder": "^3.3.1",
+    "leaflet-routing-machine": "3.2.12",
+    "leaflet.locatecontrol": "^0.89.0",
     "local-storage": "^2.0.0",
-    "osrm-text-instructions": "~0.13.0",
-    "qs": "^6.4.1"
+    "osrm-text-instructions": "^0.15.0",
+    "qs": "^6.15.1"
   }
 }

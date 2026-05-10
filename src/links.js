@@ -9,7 +9,8 @@ function _formatCoord(latLng) {
   if (!latLng) {
     return;
   }
-  return latLng.lat.toFixed(precision) + "," + latLng.lng.toFixed(precision);
+  var coord = typeof latLng.wrap === 'function' ? latLng.wrap() : latLng;
+  return coord.lat.toFixed(precision) + "," + coord.lng.toFixed(precision);
 }
 
 function _parseCoord(coordStr) {
@@ -37,22 +38,23 @@ function _parseInteger(intStr) {
 }
 
 function formatLink(options) {
-    // Output all waypoints as loc parameters, using empty string for missing
-    var locs = undefined;
-    if (options.waypoints) {
-        locs = options.waypoints.map(function(wp) {
-            return wp && wp.latLng ? _formatCoord(wp.latLng) : '';
-        });
-    }
-    return qs.stringify({
-        z: options.zoom,
-        center: options.center ? _formatCoord(options.center) : undefined,
-        loc: locs,
-        hl: options.language,
-        alt: options.alternative,
-        df: options.units,
-        srv: options.service
-    }, {indices: false});
+  // Output all waypoints as loc parameters, using empty string for missing
+  var locs = undefined;
+  if (options.waypoints) {
+    locs = options.waypoints.map(function(wp) {
+      return wp && wp.latLng ? _formatCoord(wp.latLng) : '';
+    });
+  }
+  return qs.stringify({
+    z: options.zoom,
+    center: options.center ? _formatCoord(options.center) : undefined,
+    loc: locs,
+    hl: options.language,
+    alt: options.alternative,
+    scale: options.units,
+    srv: options.service,
+    profile: options.profile
+  }, {indices: false});
 }
 
 function parseLink(link) {
@@ -77,9 +79,12 @@ function parseLink(link) {
     }
     parsedValues.language = q.hl;
     parsedValues.alternative = q.alt;
-    parsedValues.units = q.df;
+    parsedValues.units = q.scale || q.df;
     parsedValues.layer = q.ly;
     parsedValues.service = q.srv;
+    parsedValues.profile = q.profile;
+    parsedValues.originAddress = q.src;
+    parsedValues.destinationAddress = q.dst;
   } catch (e) {
     console.log("Exception " + e.name + ": " + e.message);
   }

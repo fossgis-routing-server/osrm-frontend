@@ -52,8 +52,17 @@
 /* Scale position */
 .leaflet-control-scale {
   position: absolute;
-  left: 210px;
-  bottom: 1px;
+  /* Align baseline with menu bar text */
+  bottom: 35px;
+  /* Move further left to avoid overlapping the directions pane */
+  right: 400px;
+  display: inline-block;
+  /* Make the scale widget 25% larger */
+  transform: scale(1.25);
+  -webkit-transform: scale(1.25);
+  transform-origin: left center;
+  -webkit-transform-origin: left center;
+  z-index: 1000;
 }
 
 /* Zoom control position */
@@ -176,7 +185,7 @@
   padding-top: 50px;
 }
 
-.leaflet-routing-geocoders div {
+.leaflet-routing-geocoders .leaflet-routing-geocoder {
   padding: 4px 0px 4px 0px;
 }
 
@@ -209,6 +218,11 @@
   -moz-appearance: none;
   margin-right: 0px;
   color: white;
+  height: 32px;
+  line-height: 32px;
+  padding: 0 5px;
+  vertical-align: top;
+  box-sizing: border-box;
 }
 
 .leaflet-routing-add-waypoint {
@@ -271,7 +285,7 @@
   position: fixed;
   right: 0px;
   top: 60px;
-  width: 45%;
+  width: 33.33%;
   max-width: 340px;
   min-width: 200px;
   height: 95%;
@@ -296,8 +310,8 @@
 
 .osrm-directions-icon {
     background-image: url('../images/osrm.toolbar.icons.svg');
-    -webkit-background-size: 193px 24px;
-    background-size: 193px 24px;
+    -webkit-background-size: 146px 24px;
+    background-size: 170px 24px;
     margin: 0;
     content: '';
     display: inline-block;
@@ -313,22 +327,95 @@
 .osrm-josm-icon  { background-position: -72px 0; }
 .osrm-debug-icon  { background-position: -96px 0; }
 .osrm-mapillary-icon  { background-position: -120px 0; }
-.osrm-share-icon  { background-position: -146px 0; }
-.osrm-gpx-icon  { background-position: -169px 0; }
+.osrm-gpx-icon  { background-position: -146px 0; }
+.osrm-share-icon  {
+    background-image: url('../images/share.svg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 20px 20px;
+    -webkit-background-size: 20px 20px;
+}
 .osrm-localization-chooser {
     color: #ffffff;
     background: transparent;
     border: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
     height: 24px;
-    padding-left: 3px;
-    padding-right: 3px;
+    padding-left: 6px;
+    padding-right: 6px;
     cursor: pointer;
     appearance: none;
     -moz-appearance: none;
     -webkit-appearance: none;
+    vertical-align: middle;
+    font-size: 13px;
+    line-height: 24px;
 }
 .osrm-localization-chooser:hover {
     background-color: rgba(255, 255, 255, 0.2);
+}
+
+.osrm-profile-chooser {
+    color: #ffffff;
+    background: transparent;
+    border: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    height: 24px;
+    padding-left: 6px;
+    padding-right: 6px;
+    cursor: pointer;
+    appearance: auto;
+    -moz-appearance: auto;
+    -webkit-appearance: auto;
+    vertical-align: middle;
+    font-size: 13px;
+    line-height: 24px;
+}
+
+.osrm-profile-chooser:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.leaflet-osrm-mode-selector {
+    padding: 0px;
+    display: inline-block;
+    vertical-align: top;
+    margin: 0;
+    margin-right: 3px;
+    background-color: rgba(37,72,127, 0.75);
+    border-radius: 0 0 5px 5px;
+    float: left;
+    box-sizing: border-box;
+}
+
+.leaflet-osrm-mode-selector .osrm-profile-chooser {
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    height: 32px;
+    padding-left: 6px;
+    padding-right: 6px;
+    cursor: pointer;
+    appearance: auto;
+    -moz-appearance: auto;
+    -webkit-appearance: auto;
+    vertical-align: top;
+    font-size: 13px;
+    line-height: 32px;
+    margin: 0;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.leaflet-osrm-mode-selector .osrm-profile-chooser:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.leaflet-osrm-mode-selector .osrm-profile-chooser:focus {
+    outline: none;
 }
 
 .leaflet-osrm-tools-hide
@@ -336,58 +423,74 @@
   display: none;
 }
 
-/* Sharing */
+.leaflet-osrm-tools-share {
+  position: relative;
+}
+
 .share-popup {
-    display: none;
-    position: absolute;
-    height: auto;
-    top: -5.2em;
+  display: none;
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 4px);
+  min-width: 220px;
+  padding: 4px;
+  border-radius: 4px;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+  cursor: default;
+}
+
+.share-popup-visible .share-popup {
+  display: block;
 }
 
 .share-popup .share-overlay {
-    position: fixed;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    cursor: default;
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  cursor: default;
 }
 
 .share-popup .share-container {
-    position: relative;
-    padding: 4px;
+  position: relative;
+  z-index: 1;
+  display: block;
+  padding: 0;
 }
 
 .share-popup .share-type-button-container {
-    width: 100%;
-    padding: 0;
+  display: flex;
+  width: 100%;
+  padding: 0;
 }
 
 .share-popup .share-type {
-    display: inline-block;
-    height: 24px;
-    width: 50%;
-    margin: 0;
-    border: none;
-    color: #ffffff;
-    background-color: transparent;
+  display: inline-block;
+  width: 50%;
+  margin: 0;
+  border: none;
+  color: #ffffff;
+  background-color: transparent;
+  cursor: pointer;
 }
 
 .share-popup .share-type:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .share-popup .share-type.selected {
-    background-color: rgba(255, 255, 255, 0.2);
-    cursor: default;
+  background-color: rgba(255, 255, 255, 0.2);
+  cursor: default;
 }
 
 .share-popup .share-url {
-    border: none;
-    padding: 5px;
-    color: #ffffff;
-    background-color: rgba(255, 255, 255, 0.2);
+  width: 100%;
+  margin-top: 4px;
+  border: none;
+  padding: 5px;
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* OSRM geocoder directions inputs */
@@ -976,14 +1079,42 @@ td.distance {
     transition: 0.5s;
 }
 
-#profile-selector {
-    color: #ffffff;
-    background-color: rgba(37,72,127, 0.8);
+.leaflet-osrm-tools-container .leaflet-osrm-tools-version {
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 2px 4px;
+    margin-left: auto;
+}
+
+.osrm-info-icon {
+    position: relative;
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: help;
+    color: #fff;
+    text-align: center;
+    line-height: 24px;
+    vertical-align: middle;
+}
+
+.osrm-info-icon:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.osrm-info-icon:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 4px);
+    right: 0;
+    white-space: nowrap;
+    padding: 4px 8px;
     border-radius: 4px;
-    border: 0;
-    width: 128px;
-    height: 40px;
-    margin-top: -3px;
-    padding-left: 6px;
-    padding-right: 6px;
+    background-color: rgba(37, 72, 127, 0.9);
+    color: #fff;
+    font-size: 12px;
+    font-weight: normal;
+    pointer-events: none;
+    z-index: 1000;
 }

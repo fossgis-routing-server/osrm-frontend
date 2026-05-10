@@ -1,22 +1,40 @@
 'use strict';
 
 var L = require('leaflet');
-var shortlink = require('./shortlink');
-var JXON = require('jxon');
-JXON.config({attrPrefix: '@'});
 var FileSaver = require('file-saver');
+var buildGPX = require('./gpx');
+var shortlink = require('./shortlink');
+var version = require('./version');
+var eventedMethods = L.Evented ? L.Evented.prototype : L.Mixin.Events;
+
+function stopEvent(event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+}
+
+function selectInput(input) {
+  input.focus();
+  input.select();
+}
+
+function defer(fn) {
+  window.setTimeout(fn, 0);
+}
 
 var Control = L.Control.extend({
-  includes: L.Mixin.Events,
+  includes: eventedMethods,
   options: {
-    toolContainerClass: "",
+    toolsContainerClass: "",
     editorButtonClass: "",
     josmButtonClass: "",
     debugButtonClass: "",
     mapillaryButtonClass: "",
     shareButtonClass: "",
     gpxButtonClass: "",
-    localizationChooserClass: ""
+    localizationChooserClass: "",
+    unitsChooserClass: ""
   },
 
   initialize: function(localization, languages, options) {
@@ -35,7 +53,6 @@ var Control = L.Control.extend({
       mapillaryContainer,
       mapillaryButton,
       shareContainer,
-      shareButton,
       localizationButton,
       popupCloseButton,
       gpxContainer,
@@ -59,10 +76,14 @@ var Control = L.Control.extend({
     mapillaryButton.title = this._local['Open in Mapillary'];
     L.DomEvent.on(mapillaryButton, 'click', this._openMapillary, this);
     shareContainer = L.DomUtil.create('div', 'leaflet-osrm-tools-share', this._container);
+    this._shareContainer = shareContainer;
+    L.DomEvent.disableClickPropagation(shareContainer);
+    L.DomEvent.on(shareContainer, 'mousedown', stopEvent);
+    L.DomEvent.on(shareContainer, 'mouseup', stopEvent);
+    L.DomEvent.on(shareContainer, 'click', stopEvent);
     this._shareButton = L.DomUtil.create('span', this.options.shareButtonClass, shareContainer);
-    this._sharePopup = L.DomUtil.create('div', 'leaflet-osrm-tools-container share-popup', this._shareButton);
     this._shareButton.title = this._local['Share Route'];
-    L.DomEvent.on(this._shareButton, 'click', this._showSharePopup, this);
+    L.DomEvent.on(this._shareButton, 'click', this._toggleSharePopup, this);
     gpxContainer = L.DomUtil.create('div', 'leaflet-osrm-tools-gpx', this._container);
     gpxButton = L.DomUtil.create('span', this.options.gpxButtonClass, gpxContainer);
     this._gpxButton = gpxButton;
@@ -71,6 +92,8 @@ var Control = L.Control.extend({
     L.DomEvent.on(gpxButton, 'click', this._downloadGPX, this);
     this._localizationContainer = L.DomUtil.create('div', 'leaflet-osrm-tools-localization', this._container);
     this._createLocalizationList(this._localizationContainer);
+    this._createUnitsChooser(this._localizationContainer);
+    this._createVersionInfo(this._container);
     return this._container;
   },
 
@@ -96,8 +119,10 @@ var Control = L.Control.extend({
   _openDebug: function() {
     var position = this._map.getCenter(),
       zoom = this._map.getZoom(),
-      prec = 6;
-    window.open("debug/" + this.profile.debug + ".html#" + zoom + "/" + position.lat.toFixed(prec) + "/" + position.lng.toFixed(prec));
+      prec = 6,
+      debugUrl = new URL('debug/'+ this.profile.debug + '.html', window.location.href);
+    debugUrl.hash = zoom + "/" + position.lat.toFixed(prec) + "/" + position.lng.toFixed(prec);
+    window.open(debugUrl.href);
   },
 
   setProfile: function(profile) {
@@ -111,117 +136,120 @@ var Control = L.Control.extend({
     window.open("https://www.mapillary.com/app/?lat=" + position.lat.toFixed(prec) + "&lng=" + position.lng.toFixed(prec) + "&z=" + zoom);
   },
 
-  _showSharePopup: function() {
-    L.DomUtil.addClass(this._shareButton, 'share-popup-visible');
-    var overlay = L.DomUtil.create('div', 'share-overlay', this._sharePopup);
-    L.DomEvent.on(overlay, 'click', function(e) {
-      L.DomEvent.stopPropagation(e);
+  _toggleSharePopup: function(event) {
+    stopEvent(event);
+    if (L.DomUtil.hasClass(this._shareContainer, 'share-popup-visible')) {
       this._hideSharePopup();
-    }, this);
-    var container = L.DomUtil.create('div', 'share-container', this._sharePopup);
-    L.DomEvent.on(container, 'click', function(e) {
-      L.DomEvent.stopPropagation(e);
-    });
-    var typeButtonContainer = L.DomUtil.create('div', 'share-type-button-container', container);
-    var linkButton = L.DomUtil.create('button', 'share-type', typeButtonContainer);
-    linkButton.textContent = this._local['Link'];
-    var shortLinkButton = L.DomUtil.create('button', 'share-type selected', typeButtonContainer);
-    shortLinkButton.textContent = this._local['Shortlink'];
-    var input = L.DomUtil.create('input', 'share-url', container);
-    var url = window.document.location.href;
-    shortlink.osmli(url, L.Util.bind(function (shortLink) {
-      this._shortLink = shortLink;
-      input.value = this._shortLink;
-      input.select();
-    }, this));
+    } else {
+      this._showSharePopup();
+    }
+  },
 
-    L.DomEvent.on(linkButton, 'click', function () {
+  _showSharePopup: function() {
+    var linkButton,
+      shortLinkButton,
+      overlay,
+      container,
+      currentUrl = window.document.location.href,
+      input,
+      typeButtonContainer;
+
+    this._hideSharePopup();
+    L.DomUtil.addClass(this._shareContainer, 'share-popup-visible');
+    this._sharePopup = L.DomUtil.create('div', 'share-popup fill-osrm dark', this._shareContainer);
+
+    overlay = L.DomUtil.create('div', 'share-overlay', this._sharePopup);
+    L.DomEvent.on(overlay, 'mousedown', stopEvent);
+    L.DomEvent.on(overlay, 'mouseup', stopEvent);
+    L.DomEvent.on(overlay, 'click', this._hideSharePopup, this);
+
+    container = L.DomUtil.create('div', 'share-container', this._sharePopup);
+    L.DomEvent.on(container, 'mousedown', stopEvent);
+    L.DomEvent.on(container, 'mouseup', stopEvent);
+    L.DomEvent.on(container, 'click', function(event) {
+      stopEvent(event);
+    });
+
+    typeButtonContainer = L.DomUtil.create('div', 'share-type-button-container', container);
+    linkButton = L.DomUtil.create('button', 'share-type selected', typeButtonContainer);
+    linkButton.setAttribute('type', 'button');
+    linkButton.textContent = this._local['Link'];
+
+    shortLinkButton = L.DomUtil.create('button', 'share-type', typeButtonContainer);
+    shortLinkButton.setAttribute('type', 'button');
+    shortLinkButton.textContent = this._local['Shortlink'];
+
+    input = L.DomUtil.create('input', 'share-url', container);
+    input.setAttribute('readonly', '');
+    input.value = currentUrl;
+    this._shareUrlInput = input;
+    this._shareUrl = currentUrl;
+    selectInput(input);
+
+    L.DomEvent.on(input, 'click', function() {
+      selectInput(input);
+    });
+
+    L.DomEvent.on(linkButton, 'click', function(event) {
+      stopEvent(event);
       if (!L.DomUtil.hasClass(linkButton, 'selected')) {
         L.DomUtil.addClass(linkButton, 'selected');
         L.DomUtil.removeClass(shortLinkButton, 'selected');
-        input.value = window.document.location.href;
-        input.select();
       }
+      input.value = currentUrl;
+      selectInput(input);
     });
-    L.DomEvent.on(shortLinkButton, 'click', function () {
+
+    L.DomEvent.on(shortLinkButton, 'click', function(event) {
+      stopEvent(event);
       if (!L.DomUtil.hasClass(shortLinkButton, 'selected')) {
         L.DomUtil.addClass(shortLinkButton, 'selected');
         L.DomUtil.removeClass(linkButton, 'selected');
-        if (! this._shortLink) {
-          var url = window.document.location.href;
-          shortlink.osmli(url, L.Util.bind(function (shortLink) {
-            this._shortLink = shortLink;
-            input.value = this._shortLink;
-            input.select();
-          }, this));
-        }
-        else {
-          input.value = this._shortLink;
-          input.select();
-        }
       }
+      if (this._shortLink && this._shortLinkUrl === currentUrl) {
+        input.value = this._shortLink;
+        selectInput(input);
+        return;
+      }
+      shortlink.osmli(currentUrl, function(shortUrl) {
+        if (this._shareUrl !== currentUrl || this._shareUrlInput !== input) {
+          return;
+        }
+        this._shortLink = shortUrl || currentUrl;
+        this._shortLinkUrl = currentUrl;
+        input.value = this._shortLink;
+        selectInput(input);
+      }.bind(this));
     }, this);
   },
 
-  _hideSharePopup: function() {
-      this._shortLink = null;
-      L.DomUtil.removeClass(this._shareButton, 'share-popup-visible');
-      while (this._sharePopup.lastChild) {
-        this._sharePopup.removeChild(this._sharePopup.lastChild);
+  _hideSharePopup: function(event) {
+    var sharePopup = this._sharePopup;
+    stopEvent(event);
+    this._shareUrl = null;
+    this._shareUrlInput = null;
+    L.DomUtil.removeClass(this._shareContainer, 'share-popup-visible');
+    this._sharePopup = null;
+    defer(function() {
+      if (sharePopup && sharePopup.parentNode) {
+        sharePopup.parentNode.removeChild(sharePopup);
       }
+    });
   },
 
   setRouteGeoJSON: function(routeGeoJSON) {
     this.routeGeoJSON = routeGeoJSON;
     if (this.routeGeoJSON) {
       this._gpxButton.removeAttribute('disabled');
-    }
-    else {
+    } else {
       this._gpxButton.setAttribute('disabled', '');
     }
   },
 
   _downloadGPX: function() {
     if (this.routeGeoJSON) {
-      var properties = this.routeGeoJSON.properties;
-      var metadata = {
-        'name': properties.name,
-        'copyright': {
-          '@author': properties.copyright.author,
-          'license': properties.copyright.license
-        },
-        'link': {
-          '@href': properties.link.href,
-          'text': properties.link.text
-        },
-        'time': properties.time
-      };
-      var trackPoints = this.routeGeoJSON.geometry.coordinates.map(function (coordinate) {
-        return {
-          '@lat': coordinate[1],
-          '@lon': coordinate[0],
-        };
-      });
-      var gpx = {
-        'gpx': {
-          '@xmlns': 'http://www.topografix.com/GPX/1/1',
-          '@xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-          '@xsi:schemaLocation': 'http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd',
-          '@creator': 'osrm',
-          '@version': '1.1',
-          'metadata': metadata,
-          'trk': {
-            'trkseg': {
-              'trkpt': trackPoints
-            }
-          }
-        }
-      };
-      var gpxData = JXON.stringify(gpx);
-      // Work around issues with XML name space generation in IE 11
-      // (see also https://github.com/tyrasd/jxon/issues/42)
-      gpxData = gpxData.replace(/\s+xmlns:NS\d+=""/g, '').replace(/NS\d+:/g, '');
-      var blob = new Blob(['<?xml version="1.0" encoding="utf-8"?>', '\n', gpxData], {
+      var gpxData = buildGPX(this.routeGeoJSON);
+      var blob = new Blob(['<?xml version="1.0" encoding="utf-8"?>\n', gpxData], {
         type: 'application/gpx+xml;charset=utf-8'
       }, false);
       FileSaver.saveAs(blob, 'route.gpx');
@@ -230,10 +258,9 @@ var Control = L.Control.extend({
 
   _updatePopupPosition: function(button) {
     var rect = this._container.getBoundingClientRect(),
-        left = 0;
-    if (button)
-    {
-        left = button.getBoundingClientRect().left - rect.left;
+      left = 0;
+    if (button) {
+      left = button.getBoundingClientRect().left - rect.left;
     }
     this._popupWindow.style.position = 'absolute';
     this._popupWindow.style.left = left + 'px';
@@ -245,21 +272,58 @@ var Control = L.Control.extend({
     var localizationSelect = L.DomUtil.create('select', _this.options.localizationChooserClass, container);
     localizationSelect.setAttribute('title', _this._local['Select language']);
     L.DomEvent.on(localizationSelect, 'change', function(event) {
-        this.fire('languagechanged', {
-            language: event.target.value
-        });
+      this.fire('languagechanged', {
+        language: event.target.value
+      });
     }, _this);
     Object.keys(this._languages).forEach(function(key) {
-        var option = L.DomUtil.create('option', 'fill-osrm', localizationSelect);
-        option.setAttribute('value', key);
-        option.appendChild(
-            document.createTextNode(_this._languages[key])
-        );
-        if (key == _this._local.key)
-        {
-            option.setAttribute('selected', '');
-        }
+      var option = L.DomUtil.create('option', 'fill-osrm', localizationSelect);
+      option.setAttribute('value', key);
+      option.appendChild(
+        document.createTextNode(_this._languages[key])
+      );
+      if (key == _this._local.key) {
+        option.setAttribute('selected', '');
+      }
     });
+  },
+
+  _createUnitsChooser: function(container) {
+    var _this = this;
+    var unitsSelect = L.DomUtil.create('select', _this.options.localizationChooserClass, container);
+    unitsSelect.setAttribute('title', _this._local['Select units'] || 'Select units');
+    L.DomEvent.on(unitsSelect, 'change', function(event) {
+      _this.fire('unitschanged', {
+        unit: event.target.value
+      });
+    }, _this);
+
+    var metricOption = L.DomUtil.create('option', 'fill-osrm', unitsSelect);
+    metricOption.setAttribute('value', 'metric');
+    metricOption.appendChild(document.createTextNode(_this._local['Metric'] || 'Metric'));
+
+    var imperialOption = L.DomUtil.create('option', 'fill-osrm', unitsSelect);
+    imperialOption.setAttribute('value', 'imperial');
+    imperialOption.appendChild(document.createTextNode(_this._local['Imperial'] || 'Imperial'));
+
+    var initialUnits = _this.options.initialUnits || 'metric';
+    if (initialUnits === 'imperial') {
+      imperialOption.setAttribute('selected', '');
+    } else {
+      metricOption.setAttribute('selected', '');
+    }
+  },
+
+  _createVersionInfo: function(container) {
+    var versionInfo = version.getVersionInfo();
+    var versionContainer = L.DomUtil.create('div', 'leaflet-osrm-tools-version', container);
+    var infoIcon = L.DomUtil.create('span', 'osrm-info-icon', versionContainer);
+    infoIcon.setAttribute('data-tooltip', this._local['Build'] + ': ' + versionInfo.timestamp);
+    infoIcon.textContent = '\u24D8';
+  },
+
+  updateLocalization: function(localization) {
+    this._local = localization;
   }
 });
 
