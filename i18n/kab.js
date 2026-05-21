@@ -1,0 +1,20 @@
+module.exports = {
+  name: 'Taqbaylit',
+  key: 'kab',
+  'Open in Debug Map': 'Ldi deg tkarḍa n useɣti',
+  'Open in Mapillary': 'Ldi deg Mapillary',
+  'GPX': 'Sifeḍ afaylu GPX',
+  'Open in editor': 'Ldi deg umaẓrag',
+  'Open in JOSM': 'Ldi deg JOSM',
+  'Select language': 'Fren tutlayt',
+  'Share Route': 'Bḍu abrid',
+  'Link': 'Aseɣwen',
+  'Shortlink': 'Aseɣwen ameẓẓyan',
+  'Start - press enter to drop marker': 'Ansa ara tebduḍ - sit ɣef tqeffalt sekcem iwakken ad sserseḍ ticreḍt',
+  'End - press enter to drop marker': 'Anda ara tawḍeḍ - sit ɣef tqeffalt sekcem iwakken ad sserseḍ ticreḍt',
+  'Via point - press enter to drop marker': 'Ekk - sit ɣef tqeffalt sekcem iwakken ad sserseḍ ticreḍt',
+  'Bike': 'Tasnasɣalt',
+  'Car': 'Takeṛṛust',
+  'Foot': 'Ɣef uḍar',
+  'Build': 'Build'
+};
