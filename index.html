@@ -20,10 +20,26 @@
       window.osrmConfig = {
         // OSRM_ENVIRONMENT only set to 'docker' if explicitly running in Docker
         // In all other cases (dev, browser), leave it undefined to use public services
-        OSRM_CENTER: '38.8995,-77.0269',
-        OSRM_ZOOM: 13,
-        OSRM_DEFAULT_LAYER: 'streets'
-        // OSRM_BACKEND and OSRM_MODES will be set by config.json if available
+        OSRM_CENTER: '50,12',
+        OSRM_ZOOM: 7,
+        OSRM_DEFAULT_LAYER: 'osm_de', 
+        OSRM_MODES: [
+         {
+           name: 'driving',
+           url: 'https://routing.openstreetmap.de',
+           path: 'https://routing.openstreetmap.de/routed-car/route/v1',
+           profile: 'driving'
+         }, {
+           name: 'bike',
+           url: 'https://routing.openstreetmap.de',
+           path: 'https://routing.openstreetmap.de/routed-bike/route/v1',
+           profile: 'bike'
+         }, {
+           name: 'foot',
+           url: 'https://routing.openstreetmap.de',
+           path: 'https://routing.openstreetmap.de/routed-foot/route/v1',
+           profile: 'foot'
+         }
       };
 
       (function() {
