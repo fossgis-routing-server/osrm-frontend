@@ -31,7 +31,7 @@ module.exports = {
     createGeocoder: createGeocoder,
     showAlternatives: true,
     useZoomParameter: false,
-    routeDragInterval: 200,
+    routeDragInterval: 500,
     collapsible: true
   },
   popup: {
